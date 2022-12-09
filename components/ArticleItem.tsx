@@ -1,4 +1,6 @@
 import React from 'react';
+import {useNavigation} from '@react-navigation/core';
+import {MainTabNavigationProp} from '../screens/types';
 import {StyleSheet, Pressable, Text, View, Platform} from 'react-native';
 
 export interface ArticleItemProps {
@@ -9,7 +11,9 @@ export interface ArticleItemProps {
 }
 
 function ArticleItem({id, title, publishedAt, username}: ArticleItemProps) {
+  const navigation = useNavigation<MainTabNavigationProp>();
   const onPress = () => {
+    navigation.navigate('Article', {id});
     console.log(id);
   };
 
