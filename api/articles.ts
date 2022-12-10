@@ -11,3 +11,4 @@ export async function getArticle(id: number) {
   return response.data;
 }
 
+``
