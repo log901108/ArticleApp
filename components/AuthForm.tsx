@@ -8,6 +8,8 @@ import {
   TextInput,
   KeyboardAvoidingView,
 } from 'react-native';
+import useLogin from '../hooks/useLogin';
+import useRegister from '../hooks/useRegister';
 
 export interface AuthFormProps {
   isRegister?: boolean;
@@ -18,6 +20,22 @@ function AuthForm({isRegister}: AuthFormProps) {
   const [password, setPassword] = useState('');
   const [identifier, setIdentifier] = useState('');
   const [username, setUsername] = useState('');
+
+  const {mutate: login, isLoading: loginLoading} = useLogin();
+  const {mutate: register, isLoading: registerLoading} = useRegister();
+
+  const isLoading = loginLoading || registerLoading;
+
+  const onPress = () => {
+    if (isLoading) {
+      return;
+    }
+    if (isRegister) {
+      register({email, username, password});
+    } else {
+      login({identifier, password});
+    }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -64,7 +82,8 @@ function AuthForm({isRegister}: AuthFormProps) {
               styles.submit,
               Platform.OS === 'ios' && pressed && styles.submitPressed,
             ]}
-            android_ripple={{color: '#42a5f5'}}>
+            android_ripple={{color: '#42a5f5'}}
+            onPress={onPress}>
             <Text style={styles.submitText}>
               {isRegister ? 'SignUp' : 'SignIn'}
             </Text>

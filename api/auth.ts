@@ -2,12 +2,15 @@ import client from './client';
 import {AuthResult, User} from './types';
 
 export async function register(params: RegisterParams) {
-  const response = await client.post<AuthResult>('/auth/register', params);
+  const response = await client.post<AuthResult>(
+    '/auth/local/register',
+    params,
+  );
   return response.data;
 }
 
 export async function login(params: LoginParams) {
-  const response = await client.post<AuthResult>('/auth/login', params);
+  const response = await client.post<AuthResult>('/auth/local', params);
   return response.data;
 }
 
