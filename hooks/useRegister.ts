@@ -6,10 +6,10 @@ import {useUserState} from '../contexts/UserContext';
 import {RootStackNavigationProp} from '../screens/types';
 import {applyToken} from '../api/client';
 import authStorage from '../storages/authStorage';
-
-
+import useInform from './useInform';
 
 export default function useRegister() {
+  const inform = useInform();
   const [, setUser] = useUserState();
   const navigation = useNavigation<RootStackNavigationProp>();
   const mutation = useMutation(register, {
@@ -21,6 +21,12 @@ export default function useRegister() {
       authStorage.set(data);
     },
     onError: (error: AuthError) => {
+      const message =
+        error.response?.data?.data?.[0]?.messages[0].message ?? 'SignUp Failed';
+      inform({
+        title: 'Error',
+        message,
+      });
       console.log(error);
     },
   });

@@ -6,8 +6,11 @@ import {useUserState} from '../contexts/UserContext';
 import {RootStackNavigationProp} from '../screens/types';
 import {applyToken} from '../api/client';
 import authStorage from '../storages/authStorage';
+import useInform from './useInform';
 
 export default function useLogin() {
+  const inform = useInform();
+
   const [, setUser] = useUserState();
   const navigation = useNavigation<RootStackNavigationProp>();
   const mutation = useMutation(login, {
@@ -18,6 +21,9 @@ export default function useLogin() {
       authStorage.set(data);
     },
     onError: (error: AuthError) => {
+      const message =
+        error.response?.data?.data?.[0]?.messages[0].message ?? 'SignIn Failed';
+      inform({title: 'ERROR', message});
       console.log(error);
       console.log(error.response?.data);
     },
