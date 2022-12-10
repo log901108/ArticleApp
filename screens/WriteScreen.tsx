@@ -1,17 +1,45 @@
-import React, {useState} from 'react';
+import {useNavigation} from '@react-navigation/core';
+import React, {useState, useCallback, useEffect} from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
   TextInput,
-  View,
+  Pressable,
   StyleSheet,
 } from 'react-native';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
+import {RootStackNavigationProp} from './types';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {useMutation} from 'react-query';
+import {writeArticle} from '../api/articles';
 
 function WriteScreen() {
   const {top} = useSafeAreaInsets();
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
+  const {mutate: write} = useMutation(writeArticle, {
+    onSuccess: () => {
+      navigation.goBack();
+    },
+  });
+
+  const navigation = useNavigation<RootStackNavigationProp>();
+  const onSubmit = useCallback(() => {
+    write({title, body});
+  }, [write, title, body]);
+  useEffect(() => {
+    navigation.setOptions({
+      headerRightContainerStyle: styles.headerRightContainer,
+      headerRight: () => (
+        <Pressable
+          hitSlop={8}
+          onPress={onSubmit}
+          style={({pressed}) => pressed && styles.headerRightPressed}>
+          <MaterialIcons name="send" color="#2196f3" size={24} />
+        </Pressable>
+      ),
+    });
+  }, [onSubmit, navigation]);
 
   return (
     <SafeAreaView style={styles.block} edges={['bottom']}>
@@ -61,6 +89,12 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     marginTop: 16,
     flex: 1,
+  },
+  headerRightContainer: {
+    marginRight: 16,
+  },
+  headerRightPressed: {
+    opacity: 0.75,
   },
 });
 
