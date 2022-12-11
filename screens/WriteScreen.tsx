@@ -10,15 +10,23 @@ import {
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import {RootStackNavigationProp} from './types';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {useMutation} from 'react-query';
+import {useMutation, useQueryClient} from 'react-query';
 import {writeArticle} from '../api/articles';
+import {Article} from '../api/types';
 
 function WriteScreen() {
   const {top} = useSafeAreaInsets();
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
+
+  const queryClient = useQueryClient();
+
   const {mutate: write} = useMutation(writeArticle, {
-    onSuccess: () => {
+    onSuccess: article => {
+      //check cache data
+      const articles = queryClient.getQueryData<Article[]>('articles') ?? [];
+      //update cache data
+      queryClient.setQueryData('articles', articles.concat(article)); //stale article cache key
       navigation.goBack();
     },
   });
